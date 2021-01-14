@@ -7,11 +7,18 @@ const channelSchema = new mongoose.Schema({
     },
     link: {
         type: String,
-    }
+    },
+    categories: {
+        type: [String]
+    },
+    description: String
 });
+
+channelSchema.index({description: 'text'});
 
 const Channel = mongoose.model('Channel', channelSchema);
 
+Channel.createIndexes();
 
 function validateChannel(channel) {
     const schema = Joi.object({
