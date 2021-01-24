@@ -6,12 +6,12 @@ const auth = require('../middleware/auth');
 const rss = require('../rss/rss');
 const admin = require('../middleware/admin');
 
-router.get('/', async (req, res) => {
+router.get('/',async (req, res, next) => {
   const channels = await Channel.find();
   res.send(channels);
 });
 
-router.get('/search', async (req, res) => {
+router.get('/search',async (req, res) => {
   const channels = await Channel.find({ $text: { $search: req.body.keyword } });
   res.send(channels);
 });
@@ -48,9 +48,9 @@ router.post('/', auth, async (req, res) => {
    let channel = await Channel.findOne({ name: req.body.name });
    if (channel) return res.status(400).send('Сhannel is already in the database.');
 
-  try {
+
     let articles = (await rss(req.body.link)).items;
-    let channel = new Channel ({
+    channel = new Channel ({
       name: req.body.name, 
       link: req.body.link,
       description: (await rss(req.body.link)).description,
@@ -68,10 +68,7 @@ router.post('/', auth, async (req, res) => {
       article = await article.save();
     }
     res.send(channel);
-  }
-  catch(err) {
-    console.error(err.message);
-  }  
+  
 });
 
 router.put('/:id', [auth, admin], async (req, res) => {
