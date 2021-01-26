@@ -1,8 +1,8 @@
+require('dotenv').config();
 const config = require('config');
 
 module.exports = function() {
-  if (!config.get('privateKey')) {
-    console.log('FATAL ERROR: privateKey is not defined.');
-    process.exit(1);
+  if (!process.env.test_privateKey) {
+    throw new Error('FATAL ERROR: test_privateKey is not defined.');
   }
 }

@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 const rss = require('../rss/rss');
 const admin = require('../middleware/admin');
 
-router.get('/',async (req, res, next) => {
+router.get('/',async (req, res) => {
   const channels = await Channel.find();
   res.send(channels);
 });
@@ -18,26 +18,7 @@ router.get('/search',async (req, res) => {
 
 router.get('/filter', async (req, res) => {
   const channels = await Channel.find();
-  for (var index in channels) {
-    var categories = [];
-      for (let i = 0; i < channels.length; i++) {
-        categories[i] = channels[index].categories;
-      }
-  }
-
-  var result = categories.shift().filter(function(v) {
-    return categories.every(function(a) {
-        return a.indexOf(v) !== -1;
-    });
-  });
-
-  let _query = {
-    categories: {
-      $in: result
-    }
-  };
-
-  const res_channels = await Channel.find(_query);
+  const res_channels = await Channel.find(findCommonCategories(channels));
   res.send(res_channels);
 });
 
@@ -45,30 +26,31 @@ router.post('/', auth, async (req, res) => {
   const { error } = validateChannel(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
   
-   let channel = await Channel.findOne({ name: req.body.name });
-   if (channel) return res.status(400).send('Сhannel is already in the database.');
+  let channel = await Channel.findOne({ name: req.body.name });
+  if (channel) return res.status(400).send('Сhannel is already in the database.');
 
 
-    let articles = (await rss(req.body.link)).items;
-    channel = new Channel ({
-      name: req.body.name, 
-      link: req.body.link,
-      description: (await rss(req.body.link)).description,
-      categories: (await rss(req.body.link)).itunes.categories
-    });
-    console.log((await rss(req.body.link)).itunes.categories);
+  let articles = (await rss(req.body.link)).items;
+
+  channel = new Channel ({
+    name: req.body.name, 
+    link: req.body.link,
+    description: (await rss(req.body.link)).description,
+    categories: (await rss(req.body.link)).itunes.categories
+  });
     
-    channel = await channel.save();
-    for (var index in articles) {
-      let article = new Article({
+  channel = await channel.save();
+
+  for (var index in articles) {
+    let article = new Article({
         title: articles[index].title,
         link: articles[index].link,
         channelId: channel._id
       });
       article = await article.save();
     }
+    
     res.send(channel);
-  
 });
 
 router.put('/:id', [auth, admin], async (req, res) => {
@@ -99,5 +81,28 @@ router.get('/:id', async (req, res) => {
   const articles = await Article.find({channelId: channel._id});
   res.send(articles);
 });
+
+function findCommonCategories(channels) {
+  for (var index in channels) {
+    var categories = [];
+      for (let i = 0; i < channels.length; i++) {
+        categories[i] = channels[index].categories;
+      }
+  }
+
+  let result = categories.shift().filter(function(v) {
+    return categories.every(function(a) {
+        return a.indexOf(v) !== -1;
+    });
+  });
+
+  let _query = {
+    categories: {
+      $in: result
+    }
+  };
+
+  return _query;
+}
 
 module.exports = router;
