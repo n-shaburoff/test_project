@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../../middleware/auth');
-const admin = require('../../middleware/admin');
-const channelController = require('../../api/controllers/channel');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
+const channelController = require('../controllers/channel');
 
 router.get('/', channelController.getAllChannels);
 router.get('/search', channelController.searchChannelByKey);

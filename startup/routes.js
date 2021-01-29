@@ -1,8 +1,8 @@
 const express = require('express');
-const channels = require('../api/routes/channels');
-const articles = require('../api/routes/articles');
-const users = require('../api/routes/users');
-const auth = require('../api/routes/auth');
+const channels = require('../routes/channels');
+const articles = require('../routes/articles');
+const users = require('../routes/users');
+const auth = require('../routes/auth');
 const error = require('../middleware/error');
 
 module.exports = function(app) {

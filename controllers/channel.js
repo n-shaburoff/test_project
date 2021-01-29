@@ -1,8 +1,8 @@
-const {Channel, validateChannel} = require('../../models/channel');
-const {Article, validateArticle} = require('../../models/article');
-const rss = require('../../rss/rss');
+const {Channel, validateChannel} = require('../models/channel');
+const {Article, validateArticle} = require('../models/article');
+const rss = require('../utils/rss');
 
-module.exports = {
+const channelController = {
     createChannel: async (req, res) => {
         const { error } = validateChannel(req.body); 
         if (error) return res.status(400).send(error.details[0].message);
@@ -91,3 +91,5 @@ module.exports = {
     }
     
 }
+
+module.exports = channelController;

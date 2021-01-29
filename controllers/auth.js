@@ -1,8 +1,8 @@
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
-const {User} = require('../../models/user');
+const {User} = require('../models/user');
 
-module.exports = {
+const authController = {
     singUp:  async (req, res) => {
         const { error } = validate(req.body);
         if (error) return res.status(400).send(error.details[0].message);
@@ -27,3 +27,5 @@ function validate(req) {
     });
     return schema.validate(req);
 }
+
+module.exports = authController;

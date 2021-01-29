@@ -1,8 +1,8 @@
-const {User, validateUser} = require('../../models/user');
+const {User, validateUser} = require('../models/user');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 
-module.exports = {
+const userController =  {
     getInfo:  async (req, res) => {
         const user = await User.findById(req.user._id).select('-password');
         res.send(user);
@@ -23,3 +23,5 @@ module.exports = {
         res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
     }
 }
+
+module.exports = userController;
