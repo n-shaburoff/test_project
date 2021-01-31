@@ -1,11 +1,7 @@
 const express = require('express');
-const router = express.Router();const {Channel, validateChannel} = require('../models/channel');
-const {Article, validateArticle} = require('../models/article');
+const router = express.Router();
+const artcileController = require('../controllers/article');
 
-
-router.get('/', async (req, res) => {
-    const articles = await Article.find();
-    res.send(articles);
-});
+router.get('/', artcileController.getAllArticles);
 
 module.exports = router;
